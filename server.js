@@ -85,7 +85,7 @@ app.post('/event',
     urlencodedParser, // second argument - how to parse the uploaded content
     // into req.body
     (req, res) => {
-        // make a request to the backend microservice using the request package
+        // make a request to the backend microservice using the request package test
         // the URL for the backend service should be set in configuration 
         // using an environment variable. Here, the variable is passed 
         // to npm start inside package.json:
