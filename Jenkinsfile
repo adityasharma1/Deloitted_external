@@ -45,7 +45,7 @@ pipeline {
                 sh 'gcloud container clusters get-credentials demo-events-feed-cluster --zone us-central1-a --project deloitte-demo-308622'
                 echo 'Update the image'
                 echo "gcr.io/deloitte-demo-308622/external-image:2.${env.BUILD_ID}"
-                sh "kubectl set image deployment/demo-external-events-feed-deployment demo-external-events-feed=gcr.io/deloitte-demo-308622/external-image:v2.${env.BUILD_ID} --record"
+                sh "kubectl set image deployment/demo-external-events-feed demo-external-events-feed=gcr.io/deloitte-demo-308622/external-image:v2.${env.BUILD_ID} --record"
             }
         }
 
