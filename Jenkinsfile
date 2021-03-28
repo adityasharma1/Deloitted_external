@@ -15,7 +15,7 @@ pipeline {
                 sh 'npm -v'
             }
         }
-        stage('Stage 2 - build external') {
+        stage('Stage 2 - get source and quality check') {
             // setting env variable so external default port does not conflict with jenkins
             environment {
                 PORT = 8081
@@ -32,14 +32,35 @@ pipeline {
                     sh 'npm install'
                     echo 'Run tests'
                     sh 'npm test'
-                    echo 'Tests passed on to build Docker container'
+                    
+                }
+                withSonarQubeEnv('sonarqube') {
+                    script {
+                        def scannerHome = tool 'sonarqube';
+                        sh "${scannerHome}/bin/sonar-scanner \
+                          -D sonar.login=admin \
+                          -D sonar.password=admin \
+                          -D sonar.projectKey=external \
+                          -D sonar.host.url=http://35.193.67.2:9000/"
+                    }
+                }
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Stage 3 - build external') {
+            steps {
+                echo '****************************** Stage 3'
+                dir("${env.WORKSPACE}/internal"){
                     echo "build id = ${env.BUILD_ID}"
                     sh "gcloud builds submit -t gcr.io/${projectId}/external-image:v2.${env.BUILD_ID} ."
                 }
             }
         }
         
-        stage('Stage 3') {
+        stage('Stage 3 - deploy new image') {
             steps {
                 echo 'Get cluster credentials'
                 sh 'gcloud container clusters get-credentials demo-events-feed-cluster --zone us-central1-a --project deloitte-demo-308622'
