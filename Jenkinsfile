@@ -53,7 +53,7 @@ pipeline {
         stage('Stage 3 - build external') {
             steps {
                 echo '****************************** Stage 3'
-                dir("${env.WORKSPACE}/internal"){
+                dir("${env.WORKSPACE}/external"){
                     echo "build id = ${env.BUILD_ID}"
                     sh "gcloud builds submit -t gcr.io/${projectId}/external-image:v2.${env.BUILD_ID} ."
                 }
